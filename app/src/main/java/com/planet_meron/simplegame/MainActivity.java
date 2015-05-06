@@ -3,21 +3,37 @@ package com.planet_meron.simplegame;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
+
+import com.planet_meron.simplegame.enums.ButtonType;
+import com.planet_meron.simplegame.enums.SoundType;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = MainActivity.class.getName();
+    private static final int INIT_GAME_LEVEL = 3;
+    private static final long QUESTION_TIME_INTERVAL_MS = 500; //　問題の音のなる間隔
+    private static final long HIGHLIGHT_TIME_INTERVAL_MS = 200; //　問題の音のなる間隔
 
     private SoundPool mSoundPool;
     private int mSoundId_red, mSoundId_blue, mSoundId_green, mSoundId_yellow, mSoundId_fail;
     private static final float PLAY_SPEED = 5.5f;//この値だと元の音通りに聞こえる
+
+    private boolean mIsPlayingGame;
+    private int mGameLevel;
+    private ArrayList<ButtonType> mQuestionList;
+    private int mCurrentIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +83,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         int resId = v.getId();
-        if (resId == R.id.start_image_button) return;;
+        if (resId == R.id.start_image_button) {
+            if (mIsPlayingGame) return;
+
+            initGame();
+            mQuestionList = makeQuestion(INIT_GAME_LEVEL);
+
+            return;
+        }
 
         playSound(SoundType.FromResouceId(resId));
     }
@@ -92,6 +115,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initGame() {
+
+        mGameLevel = INIT_GAME_LEVEL;
+        mIsPlayingGame = true;
+        mCurrentIndex = 0;
+    }
+
+    private ArrayList<ButtonType> makeQuestion(int level) {
+
+        ArrayList<ButtonType> questionList = new ArrayList<>();
+
+        for (int i=0; i<level; i++) {
+            Random random = new Random();
+            ButtonType b = ButtonType.FromInt(random.nextInt(4));
+            questionList.add(b);
+            showQuestion(b, questionList.size());
+        }
+
+        return questionList;
+    }
+
+    private void showQuestion(final ButtonType type, int index) {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                playsound(type);
+            }
+        }, QUESTION_TIME_INTERVAL_MS * index);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                highlightedButton(type);
+            }
+        }, QUESTION_TIME_INTERVAL_MS * index);
+    }
+
+    private void highlightedButton(ButtonType type) {
+        final ImageButton highlightedButton = (ImageButton)findViewById(ButtonType.ToResourceId(type));
+        highlightedButton.setPressed(true);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                highlightedButton.setPressed(false);
+            }
+        }, HIGHLIGHT_TIME_INTERVAL_MS);
+    }
+
+    private void playsound(ButtonType type) {
+        switch (type) {
+            case RED:     playSound(SoundType.RED); break;
+            case BLUE:     playSound(SoundType.BLUE); break;
+            case GREEN:     playSound(SoundType.GREEN); break;
+            case YELLOW:     playSound(SoundType.YELLOW); break;
+            default: break;
+        }
     }
 
     private void playSound(SoundType type) {

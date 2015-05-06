@@ -1,4 +1,6 @@
-package com.planet_meron.simplegame;
+package com.planet_meron.simplegame.enums;
+
+import com.planet_meron.simplegame.R;
 
 /**
  * Created by wakusei-meron- on 2015/05/07.
