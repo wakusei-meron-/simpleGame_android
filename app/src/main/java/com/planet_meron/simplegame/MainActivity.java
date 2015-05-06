@@ -23,8 +23,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = MainActivity.class.getName();
     private static final int INIT_GAME_LEVEL = 3;
-    private static final long QUESTION_TIME_INTERVAL_MS = 500; //　問題の音のなる間隔
-    private static final long HIGHLIGHT_TIME_INTERVAL_MS = 200; //　問題の音のなる間隔
+    private static final long QUESTION_TIME_INTERVAL_MS = 400; //　問題の音のなる間隔
+    private static final long HIGHLIGHT_TIME_INTERVAL_MS = 200;
+    private static final long BUTTON_DISABLED_TIME_MS = 3000;
 
     private SoundPool mSoundPool;
     private int mSoundId_red, mSoundId_blue, mSoundId_green, mSoundId_yellow, mSoundId_fail;
@@ -83,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         int resId = v.getId();
+
+        // startボタンをクリック
         if (resId == R.id.start_image_button) {
             if (mIsPlayingGame) return;
 
@@ -92,7 +95,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
+        //　その他の4色のボタンが押された時
         playSound(SoundType.FromResouceId(resId));
+
+        if (!mIsPlayingGame) return;
+
+        if (isCorrectButton(mQuestionList, mCurrentIndex, ButtonType.FromResouceId(resId))) {
+            // 正解
+            mCurrentIndex++;
+        } else {
+            // 不正解
+            failureAction();
+        }
+
+        if (mCurrentIndex == mGameLevel) {
+
+            mGameLevel++;
+            mQuestionList = makeQuestion(mGameLevel);
+            mCurrentIndex = 0;
+        }
     }
 
     @Override
@@ -143,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                playsound(type);
+                playSound(type);
             }
         }, QUESTION_TIME_INTERVAL_MS * index);
 
@@ -167,8 +188,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }, HIGHLIGHT_TIME_INTERVAL_MS);
     }
 
-    private void playsound(ButtonType type) {
-        switch (type) {
+    private boolean isCorrectButton(ArrayList<ButtonType> questionList, int index, ButtonType selectColor) {
+        return questionList.get(index) == selectColor;
+    }
+
+    private void failureAction() {
+
+        playSound(SoundType.FAILURE);
+        buttonEnabled(false);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                buttonEnabled(true);
+                mIsPlayingGame = false;
+            }
+        }, BUTTON_DISABLED_TIME_MS);
+    }
+
+    private void buttonEnabled(boolean enabled) {
+
+        ImageButton red, green, blue, yellow, start;
+        red    = (ImageButton)findViewById(R.id.red_image_button);
+        green  = (ImageButton)findViewById(R.id.green_image_button);
+        blue   = (ImageButton)findViewById(R.id.blue_image_button);
+        yellow = (ImageButton)findViewById(R.id.yellow_image_button);
+        start  = (ImageButton)findViewById(R.id.start_image_button);
+
+        red.setEnabled(enabled);
+        green.setEnabled(enabled);
+        blue.setEnabled(enabled);
+        yellow.setEnabled(enabled);
+        start.setEnabled(enabled);
+    }
+
+    private void playSound(ButtonType color) {
+        switch (color) {
             case RED:     playSound(SoundType.RED); break;
             case BLUE:     playSound(SoundType.BLUE); break;
             case GREEN:     playSound(SoundType.GREEN); break;
