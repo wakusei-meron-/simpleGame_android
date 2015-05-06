@@ -16,7 +16,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/redImageButton"
+        android:id="@+id/red_image_button"
         android:background="@null"
         android:src="@drawable/red_btn_state"
         android:layout_alignTop="@+id/baseImageView"
@@ -28,7 +28,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/blueImageButton"
+        android:id="@+id/blue_image_button"
         android:background="@null"
         android:src="@drawable/blue_btn_state"
         android:layout_alignBottom="@+id/baseImageView"
@@ -39,7 +39,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/greenImageButton"
+        android:id="@+id/green_image_button"
         android:background="@null"
         android:src="@drawable/green_btn_state"
         android:layout_alignBottom="@+id/baseImageView"
@@ -50,7 +50,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/yellowImageButton"
+        android:id="@+id/yellow_image_button"
         android:background="@null"
         android:src="@drawable/yellow_btn_state"
         android:layout_alignTop="@+id/baseImageView"
@@ -61,7 +61,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/startImageButton"
+        android:id="@+id/start_image_button"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:background="@null"
